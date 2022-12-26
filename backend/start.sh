@@ -9,6 +9,13 @@ do
   sleep 1
 done
 
+if [ -n "$DJANGO_SUPERUSER_USERNAME" ] && [ -n "$DJANGO_SUPERUSER_PASSWORD" ] ; then
+    python manage.py createsuperuser --no-input
+fi
+
+python manage.py loaddata fixture
+python manage.py collectstatic --noinput
+
 echo "=Starting runserver="
-gunicorn wsgi:application \
-         --bind 0.0.0.0:80\
+gunicorn app.wsgi:application \
+         --bind 0.0.0.0:8001

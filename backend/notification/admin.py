@@ -11,7 +11,7 @@ class ClientAdmin(admin.ModelAdmin):
 
 
 class MessageAdmin(admin.ModelAdmin):
-    list_display = ('message', 'created_at', 'updated_at')
+    list_display = ('text', 'created_at', 'updated_at')
 
     class Meta:
         model = models.Message

@@ -1,5 +1,4 @@
 from django.db import models
-from django.core.exceptions import ValidationError
 
 
 class Client(models.Model):
@@ -10,36 +9,39 @@ class Client(models.Model):
 
     @property
     def phone_number(self):
-        return f'+{self.code} ({str(self.number)[:3]}) {str(self.number)[3:5]}-{str(self.number)[6:]}'
+        return f'+{self.code} ({str(self.number)[:3]}) {str(self.number)[3:6]}-{str(self.number)[6:]}'
+
+    @property
+    def phone_number_int(self):
+        return int(f'{self.code}{self.number}')
 
     def __str__(self):
         return self.phone_number
 
 
 class Message(models.Model):
-
-    message = models.CharField(max_length=2048, blank=True)
+    text = models.CharField(max_length=2048, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.message[:50]
+        return self.text[:50]
 
 
 class Delivery(models.Model):
-    message = models.OneToOneField(
+    message = models.ForeignKey(
         Message,
         on_delete=models.CASCADE,
-        primary_key=True,
+        blank=True,
+        null=True
     )
-
     time_start = models.DateTimeField()
     time_end = models.DateTimeField()
 
     members = models.ManyToManyField(Client, through='Membership')
 
     def __str__(self):
-        return f'Delivery {self.pk} with message: {self.message.message[:50]}'
+        return f'Delivery {self.pk}'
 
 
 class Membership(models.Model):
@@ -59,4 +61,4 @@ class Membership(models.Model):
     delivery = models.ForeignKey(Delivery, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'delivery {self.delivery.pk}'
+        return f'delivery {self.delivery.pk}, client {self.client.pk}'
